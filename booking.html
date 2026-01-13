@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Trip - Astourist - Depot</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <style>
+        :root {
+            --forest-green: #2D5016;
+            --terracotta: #B85450;
+            --cream: #F5F3F0;
+            --white: #FFFFFF;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream);
+        }
+        
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .glass-nav {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--forest-green), #3D6B1E);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--terracotta), #C66460);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(184, 84, 80, 0.3);
+        }
+        
+        .payment-method {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--forest-green);
+            background-color: rgba(45, 80, 22, 0.05);
+        }
+        
+        .payment-method.active {
+            border-color: var(--forest-green);
+            background-color: rgba(45, 80, 22, 0.1);
+        }
+        
+        .payment-form {
+            display: none;
+        }
+        
+        .payment-form.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--forest-green), var(--terracotta));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .step {
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        
+        .step.completed {
+            opacity: 1;
+        }
+        
+        .booking-step {
+            display: none;
+        }
+        
+        .booking-step.active {
+            display: block;
+        }
+        
+        .booking-summary {
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.05), rgba(184, 84, 80, 0.05));
+            border: 1px solid rgba(45, 80, 22, 0.1);
+        }
+        
+        .upi-qr {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .card-input {
+            position: relative;
+        }
+        
+        .card-input input {
+            padding-left: 3rem;
+        }
+        
+        .card-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        .success-animation {
+            animation: successPulse 2s ease-in-out;
+        }
+        
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--forest-green);
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .trust-badge {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .trust-badge:hover {
+            border-color: var(--forest-green);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full top-0 z-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <a href="index.html">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-800 to-green-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">AS</span>
+                        </div>
+                        <span class="font-display text-2xl font-bold text-gray-800">Astourist - Depot</span>
+                    </div>
+                </a>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-600 hover:text-green-800 font-medium transition-colors">Home</a>
+                    <a href="about.html" class="text-gray-600 hover:text-green-800 font-medium transition-colors">About</a>
+                    <a href="booking.html" class="text-gray-800 hover:text-green-800 font-medium transition-colors">Book Now</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Booking Progress -->
+    <section class="pt-24 pb-8 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h1 class="font-display text-4xl font-bold text-gray-800 mb-4">Complete Your Booking</h1>
+                <div class="progress-bar mb-4">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span class="step active" id="step-1">Package Details</span>
+                    <span class="step" id="step-2">Traveler Info</span>
+                    <span class="step" id="step-3">Payment</span>
+                    <span class="step" id="step-4">Confirmation</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Content -->
+    <section class="pb-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Main Content -->
+                <div class="lg:col-span-2">
+                    <!-- Step 1: Package Details -->
+                    <div class="booking-step active" id="booking-step-1">
+                        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                            <h2 class="font-display text-2xl font-bold text-gray-800 mb-6">Package Details</h2>
+                            <div id="package-summary">
+                                <!-- Package details will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Traveler Information -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="font-display text-2xl font-bold text-gray-800 mb-6">Traveler Information</h2>
+                            <form id="traveler-form">
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+                                        <input type="text" id="full-name" required 
+                                               class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                               placeholder="Enter your full name">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
+                                        <input type="email" id="email" required 
+                                               class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                               placeholder="your@email.com">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
+                                        <input type="tel" id="phone" required 
+                                               class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                               placeholder="+91 XXXXX-XXXXX">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Age</label>
+                                        <input type="number" id="age" min="1" max="120"
+                                               class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                               placeholder="25">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Special Requirements</label>
+                                        <textarea id="special-requirements" rows="3"
+                                                  class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                                  placeholder="Any dietary restrictions, medical conditions, or special requests..."></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-8">
+                                    <button type="button" onclick="nextBookingStep(1)" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                                        Continue to Payment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Payment -->
+                    <div class="booking-step" id="booking-step-2">
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h2 class="font-display text-2xl font-bold text-gray-800 mb-6">Choose Payment Method</h2>
+                            
+                            <!-- Payment Methods -->
+                            <div class="grid md:grid-cols-3 gap-4 mb-8">
+                                <div class="payment-method active p-4 rounded-lg" data-method="upi">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                                            <span class="text-white text-sm font-bold">UPI</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800">UPI Payment</h3>
+                                            <p class="text-sm text-gray-600">Pay with any UPI app</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-method p-4 rounded-lg" data-method="card">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                                            <span class="text-white text-sm font-bold">💳</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800">Card Payment</h3>
+                                            <p class="text-sm text-gray-600">Credit/Debit card</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-method p-4 rounded-lg" data-method="bank">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                                            <span class="text-white text-sm font-bold">🏦</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800">Net Banking</h3>
+                                            <p class="text-sm text-gray-600">Bank transfer</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- UPI Payment Form -->
+                            <div class="payment-form active" id="upi-form">
+                                <div class="bg-gray-50 rounded-lg p-6">
+                                    <h3 class="font-semibold text-gray-800 mb-4">UPI Payment</h3>
+                                    <div class="text-center">
+                                        <div class="upi-qr">
+                                           <span><strong><b>UPI ID - kohli7138@oksbi</b></strong></span>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="processUPIPayment()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold mt-6" style="width: 270px;">
+                                        Pay with UPI
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Card Payment Form -->
+                            <div class="payment-form" id="card-form">
+                                <div class="bg-gray-50 rounded-lg p-6">
+                                    <h3 class="font-semibold text-gray-800 mb-4">Card Payment</h3>
+                                    <div class="space-y-4">
+                                        <div class="card-input">
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Card Number</label>
+                                            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19"
+                                                   class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                            <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M22 4H2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H2v-6h20v6zm0-10H2V6h20v2z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-700 mb-2">Expiry Date</label>
+                                                <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5"
+                                                       class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-700 mb-2">CVV</label>
+                                                <input type="text" id="card-cvv" placeholder="123" maxlength="4"
+                                                       class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Cardholder Name</label>
+                                            <input type="text" id="card-name" placeholder="John Doe"
+                                                   class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="processCardPayment()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold mt-6">
+                                        Pay with Card
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Net Banking Form -->
+                            <div class="payment-form" id="bank-form">
+                                <div class="bg-gray-50 rounded-lg p-6">
+                                    <h3 class="font-semibold text-gray-800 mb-4">Net Banking</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Select Bank</label>
+                                            <select id="bank-select" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                                <option value="">Choose your bank</option>
+                                                <option value="sbi">State Bank of India</option>
+                                                <option value="hdfc">HDFC Bank</option>
+                                                <option value="icici">ICICI Bank</option>
+                                                <option value="pnb">Punjab National Bank</option>
+                                                <option value="axis">Axis Bank</option>
+                                                <option value="kotak">Kotak Mahindra Bank</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Account Number</label>
+                                            <input type="text" id="account-number" placeholder="Enter your account number"
+                                                   class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                        </div>
+                                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <p class="text-sm text-blue-800">
+                                                <strong>Note:</strong> You will be redirected to your bank's secure payment gateway to complete the transaction.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="processBankPayment()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold mt-6">
+                                        Proceed to Bank
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Trust Badges -->
+                            <div class="grid grid-cols-4 gap-4 mt-8">
+                                <div class="trust-badge">
+                                    <div class="text-green-600 text-2xl mb-2">🔒</div>
+                                    <p class="text-xs text-gray-600">SSL Secured</p>
+                                </div>
+                                <div class="trust-badge">
+                                    <div class="text-blue-600 text-2xl mb-2">💳</div>
+                                    <p class="text-xs text-gray-600">PCI Compliant</p>
+                                </div>
+                                <div class="trust-badge">
+                                    <div class="text-purple-600 text-2xl mb-2">🏆</div>
+                                    <p class="text-xs text-gray-600">Trusted Partner</p>
+                                </div>
+                                <div class="trust-badge">
+                                    <div class="text-orange-600 text-2xl mb-2">⚡</div>
+                                    <p class="text-xs text-gray-600">Instant Confirmation</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Confirmation -->
+                    <div class="booking-step" id="booking-step-3">
+                        <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                            <div class="success-animation">
+                                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="font-display text-3xl font-bold text-gray-800 mb-4">Booking Confirmed!</h2>
+                                <p class="text-xl text-gray-600 mb-8">Your Himalayan adventure is just a step away. Check your email for detailed itinerary and travel documents.</p>
+                                
+                                <div class="bg-gray-50 rounded-lg p-6 mb-8">
+                                    <h3 class="font-semibold text-gray-800 mb-4">Booking Details</h3>
+                                    <div id="confirmation-details">
+                                        <!-- Confirmation details will be loaded here -->
+                                    </div>
+                                </div>
+                                
+                                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <button onclick="downloadVoucher()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                                        Download Voucher
+                                    </button>
+                                    <button onclick="emailVoucher()" class="btn-secondary text-white px-8 py-3 rounded-lg font-semibold">
+                                        Email Voucher
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Summary Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="booking-summary rounded-2xl p-6 sticky top-28">
+                        <h3 class="font-display text-xl font-bold text-gray-800 mb-4">Booking Summary</h3>
+                        <div id="booking-summary-content">
+                            <!-- Booking summary will be loaded here -->
+                        </div>
+                        
+                        <!-- Support Contact -->
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h4 class="font-semibold text-gray-800 mb-3">Need Help?</h4>
+                            <div class="space-y-2 text-sm text-gray-600">
+                                <p>📞 +91 98765 43210</p>
+                                <p>📧 support@himalayatravels.com</p>
+                                <p>🕒 24/7 Customer Support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <a href="index.html">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-600 to-green-400 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">AS</span>
+                        </div>
+                        <span class="font-display text-2xl font-bold">Astourist - Depot</span>
+                    </div>
+                    </a>
+                    <p class="text-gray-400 mb-4">
+                        Your trusted partner for unforgettable Himalayan adventures.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="booking.html" class="text-gray-400 hover:text-white transition-colors">Book Now</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms & Conditions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Contact Info</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <p>📞 +91 98765 43210</p>
+                        <p>📧 info@himalayatravels.com</p>
+                        <p>📍 Shimla, Himachal Pradesh</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Astourist - Depot. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentBookingStep = 1;
+        let bookingData = {};
+        let selectedPaymentMethod = 'upi';
+
+        // Initialize booking page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBookingData();
+            initializePaymentMethods();
+            updateProgressBar();
+        });
+
+        // Load booking data from localStorage
+        function loadBookingData() {
+            // Get selected package
+            const selectedPackage = localStorage.getItem('selectedPackage');
+            if (selectedPackage) {
+                bookingData.package = JSON.parse(selectedPackage);
+            } else {
+                // Set default package
+                bookingData.package = {
+                    package: 'Shimla + Manali Combo',
+                    price: 2500
+                };
+            }
+            
+            // Get booking form data
+            const bookingFormData = localStorage.getItem('bookingData');
+            if (bookingFormData) {
+                bookingData.form = JSON.parse(bookingFormData);
+            }
+            
+            updatePackageSummary();
+            updateBookingSummary();
+        }
+
+        // Update package summary
+        function updatePackageSummary() {
+            const container = document.getElementById('package-summary');
+            if (bookingData.package) {
+                const pkg = bookingData.package;
+                container.innerHTML = `
+                    <div class="flex items-start space-x-4">
+                        <div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
+                            <img src="resources/resort-2.jpg" class="w-full h-full object-cover rounded-lg">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-display text-xl font-bold text-gray-800 mb-2">${pkg.package || 'Selected Package'}</h3>
+                            <p class="text-gray-600 mb-2">Experience the majestic Himalayas and Shimla with our premium tour package</p>
+                            <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                <span>💰 Total: ₹${pkg.price || '0'}</span>
+                                <span>📅 Duration: Customizable</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Update booking summary
+        function updateBookingSummary() {
+            const container = document.getElementById('booking-summary-content');
+            const basePrice = bookingData.package ? bookingData.package.price : 0;
+            const taxes = Math.round(basePrice * 0.18); // 18% GST
+            const total = basePrice + taxes;
+            
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Package Price</span>
+                        <span class="font-semibold">₹2,500</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">GST (18%)</span>
+                        <span class="font-semibold">₹450</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">First time booking discount</span>
+                        <span class="font-semibold">-₹950</span>
+                    </div>
+                    <div class="border-t pt-3">
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-800">Total Amount</span>
+                            <span class="font-bold text-xl text-green-600">₹2,000</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <div class="text-sm text-gray-600 space-y-2">
+                        <p><strong>What's Included:</strong></p>
+                        <ul class="space-y-1 text-xs">
+                            <li>• Accommodation as per itinerary</li>
+                            <li>• Meals (Breakfast & Dinner)</li>
+                            <li>• Sightseeing and activities</li>
+                            <li>• Transportation</li>
+                            <li>• Professional guide services</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize payment methods
+        function initializePaymentMethods() {
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    const methodType = this.dataset.method;
+                    selectPaymentMethod(methodType);
+                });
+            });
+        }
+
+        // Select payment method
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Update active payment method
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelector(`[data-method="${method}"]`).classList.add('active');
+            
+            // Show corresponding form
+            document.querySelectorAll('.payment-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(`${method}-form`).classList.add('active');
+        }
+
+        // Next booking step
+        function nextBookingStep(step) {
+            if (step === 1) {
+                // Validate traveler form
+                if (!validateTravelerForm()) {
+                    return;
+                }
+                
+                // Save traveler data
+                saveTravelerData();
+            }
+            
+            // Hide current step
+            document.getElementById(`booking-step-${step}`).classList.remove('active');
+            
+            // Show next step
+            currentBookingStep = step + 1;
+            document.getElementById(`booking-step-${currentBookingStep}`).classList.add('active');
+            
+            // Update progress
+            updateProgressBar();
+            
+            // Scroll to next step
+            setTimeout(() => {
+                document.getElementById(`booking-step-${currentBookingStep}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Validate traveler form
+        function validateTravelerForm() {
+            const requiredFields = ['full-name', 'email', 'phone'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+            
+            if (!isValid) {
+                showNotification('Please fill in all required fields', 'error');
+            }
+            
+            return isValid;
+        }
+
+        // Save traveler data
+        function saveTravelerData() {
+            bookingData.traveler = {
+                fullName: document.getElementById('full-name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                age: document.getElementById('age').value,
+                specialRequirements: document.getElementById('special-requirements').value
+            };
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const progressFill = document.getElementById('progress-fill');
+            const steps = document.querySelectorAll('.step');
+            
+            // Update progress bar
+            const progress = (currentBookingStep / 2.7) * 100;
+            progressFill.style.width = `${progress}%`;
+            
+            // Update step indicators
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentBookingStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentBookingStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        // Payment processing functions
+        function processUPIPayment() {
+            // Save payment data
+            bookingData.payment = {
+                method: 'UPI',
+                details: {},
+                transactionId: 'HT' + Date.now(),
+                status: 'success',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Show success notification
+            showNotification('Payment successful! Booking confirmed.', 'success');
+            
+            // Show confirmation
+            showConfirmation();
+        }
+
+        function processCardPayment() {
+            const cardNumber = document.getElementById('card-number').value;
+            const expiry = document.getElementById('card-expiry').value;
+            const cvv = document.getElementById('card-cvv').value;
+            const name = document.getElementById('card-name').value;
+            
+            if (!cardNumber || !expiry || !cvv || !name) {
+                showNotification('Please fill in all card details', 'error');
+                return;
+            }
+            
+            processPayment('Card', { cardNumber, expiry, cvv, name });
+        }
+
+        function processBankPayment() {
+            const bank = document.getElementById('bank-select').value;
+            const account = document.getElementById('account-number').value;
+            
+            if (!bank || !account) {
+                showNotification('Please select your bank and enter account number', 'error');
+                return;
+            }
+            
+            processPayment('Net Banking', { bank, account });
+        }
+
+        // Process payment
+        function processPayment(method, paymentDetails) {
+            // Show loading
+            showLoading();
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                const success = Math.random() > 0.1; // 90% success rate
+                
+                if (success) {
+                    // Save payment data
+                    bookingData.payment = {
+                        method,
+                        details: paymentDetails,
+                        transactionId: 'HT' + Date.now(),
+                        status: 'success',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Show confirmation
+                    showConfirmation();
+                } else {
+                    hideLoading();
+                    showNotification('Payment failed. Please try again or use a different payment method.', 'error');
+                }
+            }, 3000);
+        }
+
+        // Show loading
+        function showLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'payment-loading';
+            loadingDiv.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            loadingDiv.innerHTML = `
+                <div class="bg-white rounded-lg p-8 text-center">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-600">Processing your payment...</p>
+                    <p class="text-sm text-gray-500 mt-2">Please do not close this page</p>
+                </div>
+            `;
+            document.body.appendChild(loadingDiv);
+        }
+
+        // Hide loading
+        function hideLoading() {
+            const loadingDiv = document.getElementById('payment-loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // Show confirmation
+        function showConfirmation() {
+            hideLoading();
+            
+            // Update confirmation details
+            const container = document.getElementById('confirmation-details');
+            const total = bookingData.package ? bookingData.package.price * 1.18 : 0;
+            
+            container.innerHTML = `
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Booking ID:</span>
+                        <span class="font-semibold">${bookingData.payment.transactionId}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Package:</span>
+                        <span class="font-semibold">${bookingData.package ? bookingData.package.package : 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Traveler:</span>
+                        <span class="font-semibold">${bookingData.traveler ? bookingData.traveler.fullName : 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Total Paid:</span>
+                        <span class="font-semibold text-green-600">₹2,000</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Payment Method:</span>
+                        <span class="font-semibold">${bookingData.payment.method}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Booking Date:</span>
+                        <span class="font-semibold">${new Date().toLocaleDateString('en-IN')}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Move to confirmation step
+            document.getElementById('booking-step-2').classList.remove('active');
+            currentBookingStep = 3;
+            document.getElementById('booking-step-3').classList.add('active');
+            updateProgressBar();
+            
+            // Clear localStorage
+            localStorage.removeItem('selectedPackage');
+            localStorage.removeItem('bookingData');
+        }
+
+        // Utility functions
+        function downloadVoucher() {
+            showNotification('There is problem to download your voucher. Please try another option!!');
+            // In a real implementation, this would trigger a PDF download
+        }
+
+        function emailVoucher() {
+            showNotification('Voucher sent to your email', 'success');
+            // In a real implementation, this would send an email
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+                type === 'error' ? 'bg-red-500 text-white' : 
+                type === 'success' ? 'bg-green-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Card number formatting
+        document.addEventListener('input', function(e) {
+            if (e.target.id === 'card-number') {
+                let value = e.target.value.replace(/\s/g, '');
+                let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
+                e.target.value = formattedValue;
+            }
+            
+            if (e.target.id === 'card-expiry') {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+            }
+        });
+    </script>
+    <script src="main.js"></script>
+</body>
+</html>

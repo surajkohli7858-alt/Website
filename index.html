@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstouristDepot - Go with us</title>
+    <link rel="icon" type="image/png" href="resources/logo.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+    
+    <style>
+        :root {
+            --forest-green: #2D5016;
+            --terracotta: #B85450;
+            --cream: #F5F3F0;
+            --white: #FFFFFF;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream);
+        }
+        
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(rgba(45, 80, 22, 0.3), rgba(184, 84, 80, 0.2)), 
+                        url('resources/hero-himalayas.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .glass-nav {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .booking-widget {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .destination-card {
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+        
+        .destination-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--forest-green), #3D6B1E);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--terracotta), #C66460);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(184, 84, 80, 0.3);
+        }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+        
+        .splide__arrow {
+            background: var(--forest-green);
+            opacity: 0.8;
+        }
+        
+        .splide__arrow:hover {
+            opacity: 1;
+        }
+        
+        .price-tag {
+            background: linear-gradient(135deg, var(--terracotta), #D67470);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .step {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background: var(--forest-green);
+            color: white;
+        }
+        
+        .step.completed {
+            background: var(--terracotta);
+            color: white;
+        }
+        
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: #e5e7eb;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step-line.completed {
+            background: var(--terracotta);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full top-0 z-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <a href="index.html">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-800 to-green-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">AS</span>
+                        </div>
+                        <span class="font-display text-2xl font-bold text-gray-800">Astourist - Depot</span>
+                    </div>
+                </a>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-800 hover:text-green-800 font-medium transition-colors">Home</a>
+                    <a href="about.html" class="text-gray-600 hover:text-green-800 font-medium transition-colors">About</a>
+                    <a href="booking.html">
+                    <button class="btn-primary text-white px-6 py-2 rounded-full font-medium">
+                        Book Now
+                    </button>
+                    </a>
+                </div>
+                
+                <button class="md:hidden p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="floating-shapes">
+            <div class="shape w-20 h-20 bg-white rounded-full" style="left: 10%; animation-delay: 0s;"></div>
+            <div class="shape w-16 h-16 bg-green-200 rounded-lg" style="left: 80%; animation-delay: 5s;"></div>
+            <div class="shape w-12 h-12 bg-orange-200 rounded-full" style="left: 60%; animation-delay: 10s;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Hero Content -->
+                <div class="text-white">
+                    <h1 class="font-display text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+                        <span id="typed-text"></span>
+                    </h1>
+                    <p class="text-xl lg:text-2xl mb-8 text-gray-100 leading-relaxed">
+                        Experience the breathtaking beauty of the Himalayas with our expertly crafted travel packages. 
+                        From colonial Shimla to adventurous Manali, discover your perfect mountain escape.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="btn-primary text-white px-8 py-4 rounded-full font-semibold text-lg">
+                            Start Your Journey
+                        </button>
+                        <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-green-800 transition-all">
+                            Watch Video
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Booking Widget -->
+                <div class="booking-widget rounded-2xl p-8">
+                    <h3 class="font-display text-2xl font-bold text-gray-800 mb-6">Plan Your Adventure</h3>
+                    
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active" id="step-1">1</div>
+                        <div class="step-line" id="line-1"></div>
+                        <div class="step" id="step-2">2</div>
+                        <div class="step-line" id="line-2"></div>
+                        <div class="step" id="step-3">3</div>
+                    </div>
+                    
+                    <form id="booking-form">
+                        <!-- Step 1: Destination -->
+                        <div class="booking-step active" id="booking-step-1">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">Choose Your Destination</label>
+                            <select class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" id="destination">
+                                <option value="">Select Destination</option>
+                                <option value="shimla">Shimla - The Queen of Hills</option>
+                                <option value="manali">Manali - Valley of Gods</option>
+                                <option value="shimla-manali">Shimla + Manali Combo</option>
+                                <option value="himachal">Complete Himachal Tour</option>
+                                <option value="custom">Custom Package</option>
+                            </select>
+                            <button type="button" class="w-full btn-primary text-white py-3 rounded-lg font-semibold mt-6" onclick="nextStep(1)">
+                                Continue
+                            </button>
+                        </div>
+                        
+                        <!-- Step 2: Dates -->
+                        <div class="booking-step" id="booking-step-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">Travel Dates</label>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Check-in</label>
+                                    <input type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" id="checkin">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Check-out</label>
+                                    <input type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" id="checkout">
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="button" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold" onclick="prevStep(2)">
+                                    Back
+                                </button>
+                                <button type="button" class="flex-1 btn-primary text-white py-3 rounded-lg font-semibold" onclick="nextStep(2)">
+                                    Continue
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Travelers -->
+                        <div class="booking-step" id="booking-step-3">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">Traveler Details</label>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Adults</label>
+                                    <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" id="adults">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5+</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Children</label>
+                                    <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" id="children">
+                                        <option>0</option>
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4+</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="button" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold" onclick="prevStep(3)">
+                                    Back
+                                </button>
+                                <button type="submit" class="flex-1 btn-secondary text-white py-3 rounded-lg font-semibold">
+                                    Search Packages
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Featured Packages -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal" id="Featured-Packages">
+                <h2 class="font-display text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+                    Featured Packages
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Carefully curated packages that offer the best value and experiences for every type of traveler.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="destination-card rounded-2xl overflow-hidden shadow-lg reveal">
+                    <div class="relative h-48">
+                        <img src="resources/toy-train.jpg" alt="Toy Train" class="w-full h-full object-cover">
+                        <div class="absolute top-4 right-4 price-tag">₹2,300</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Shimla Heritage Tour</h3>
+                        <p class="text-gray-600 mb-4 text-sm">3 days • 2 nights</p>
+                        <ul class="text-sm text-gray-600 mb-4 space-y-1">
+                            <li>• Toy train ride from Kalka</li>
+                            <li>• Mall Road exploration</li>
+                            <li>• Jakhu Temple visit</li>
+                            <li>• Heritage hotel stay</li>
+                        </ul>
+                        <a href="booking.html">
+                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
+                            Book Now
+                        </button>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="destination-card rounded-2xl overflow-hidden shadow-lg reveal">
+                    <div class="relative h-48">
+                        <img src="resources/resort-1.jpg" alt="Manali Resort" class="w-full h-full object-cover">
+                        <div class="absolute top-4 right-4 price-tag">₹2,000</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Manali Adventure</h3>
+                        <p class="text-gray-600 mb-4 text-sm">4 days • 3 nights</p>
+                        <ul class="text-sm text-gray-600 mb-4 space-y-1">
+                            <li>• Solang Valley adventures</li>
+                            <li>• Rohtang Pass visit</li>
+                            <li>• Hadimba Temple tour</li>
+                            <li>• River rafting experience</li>
+                        </ul>
+                        <a href="booking.html">
+                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
+                            Book Now
+                        </button>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="destination-card rounded-2xl overflow-hidden shadow-lg reveal">
+                    <div class="relative h-48">
+                        <img src="resources/resort-2.jpg" alt="Luxury Resort" class="w-full h-full object-cover">
+                        <div class="absolute top-4 right-4 price-tag">₹2,500</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Shimla + Manali Combo</h3>
+                        <p class="text-gray-600 mb-4 text-sm">6 days • 5 nights</p>
+                        <ul class="text-sm text-gray-600 mb-4 space-y-1">
+                            <li>• Both destinations covered</li>
+                            <li>• Kufri snow activities</li>
+                            <li>• Premium accommodations</li>
+                            <li>• All meals included</li>
+                        </ul>
+                        <a href="booking.html">
+                        <button class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
+                            Book Now
+                        </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Testimonials -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+                    What Our Travelers Say
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Real experiences from real travelers who discovered the Himalayas with us.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 rounded-2xl p-8 reveal">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400">
+                            <span>★★★★★</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6 italic">
+                        "The Shimla-Manali combo package exceeded all expectations. The heritage hotels were charming, 
+                        and every detail was perfectly planned. The toy train ride was magical!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-green-800 font-semibold">PR</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Priya Sharma</h4>
+                            <p class="text-sm text-gray-500">Delhi</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-2xl p-8 reveal">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400">
+                            <span>★★★★★</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6 italic">
+                        "Amazing adventure activities in Manali! The paragliding and river rafting were thrilling. 
+                        The guides were professional and safety-conscious. Highly recommend!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-blue-800 font-semibold">RK</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Rohit Kumar</h4>
+                            <p class="text-sm text-gray-500">Mumbai</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-2xl p-8 reveal">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400">
+                            <span>★★★★★</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6 italic">
+                        "Perfect honeymoon package! The mountain views were stunning, and the accommodations were 
+                        luxurious. The candlelight dinner was a beautiful touch. Thank you!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-pink-800 font-semibold">AS</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Anita Singh</h4>
+                            <p class="text-sm text-gray-500">Chandigarh</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-20 bg-gradient-to-r from-green-800 to-green-600">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="font-display text-4xl font-bold text-white mb-4">
+                Stay Updated with Exclusive Deals
+            </h2>
+            <p class="text-xl text-green-100 mb-8">
+                Get the latest travel inspiration and special offers delivered to your inbox.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                <input type="email" placeholder="Enter your email" class="flex-1 px-6 py-4 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-white">
+                <button class="btn-secondary text-white px-8 py-4 rounded-full font-semibold whitespace-nowrap">
+                    Subscribe
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <a href="index.html">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-600 to-green-400 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">AS</span>
+                        </div>
+                        <span class="font-display text-2xl font-bold">Astourist - Depot</span>
+                    </div>
+                    </a>
+                    <p class="text-gray-400 mb-4">
+                        Your trusted partner for unforgettable Himalayan adventures.
+                    </p>
+                    <div class="flex space-x-4">
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="booking.html" class="text-gray-400 hover:text-white transition-colors">Book Now</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms & Conditions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Cancellation Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Contact Info</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <p>📞 +91 98765 43210</p>
+                        <p>📧 info@himalayatravels.com</p>
+                        <p>📍 Shimla, Himachal Pradesh</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Astourist - Depot. All rights reserved. | Made with ❤️ in the Himalayas</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

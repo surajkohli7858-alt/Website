@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Astourist - Depot</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --forest-green: #2D5016;
+            --terracotta: #B85450;
+            --cream: #F5F3F0;
+            --white: #FFFFFF;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream);
+        }
+        
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .glass-nav {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--forest-green), #3D6B1E);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.3);
+        }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+        
+        .team-card {
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+        
+        .team-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.1), rgba(184, 84, 80, 0.1));
+            border: 1px solid rgba(45, 80, 22, 0.2);
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item.active {
+            border-bottom-color: var(--forest-green);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-answer.active {
+            max-height: 200px;
+        }
+        
+        .contact-card {
+            background: var(--white);
+            transition: all 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        #map {
+            height: 300px;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full top-0 z-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <a href="index.html">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-800 to-green-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">AS</span>
+                        </div>
+                        <span class="font-display text-2xl font-bold text-gray-800">Astourist - Depot</span>
+                    </div>
+                </a>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-600 hover:text-green-800 font-medium transition-colors">Home</a>
+                    <a href="about.html" class="text-gray-600 hover:text-green-800 font-medium transition-colors">About</a>
+                    <a href="booking.html" class="text-gray-800 hover:text-green-800 font-medium transition-colors">Book Now</a>
+                    <a href="#getintouch">
+                    <button class="btn-primary text-white px-6 py-2 rounded-full font-medium">
+                        Contact Us
+                    </button>
+                    </a>
+                </div>
+                
+                <button class="md:hidden p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="pt-24 pb-12 bg-gradient-to-r from-green-800 to-green-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="font-display text-4xl lg:text-6xl font-bold mb-4">
+                    About Astourist - Depot
+                </h1>
+                <p class="text-xl lg:text-2xl text-green-100 max-w-3xl mx-auto">
+                    Your trusted companion for unforgettable journeys through the majestic Himalayas
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Story -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="reveal">
+                    <h2 class="font-display text-4xl font-bold text-gray-800 mb-6">
+                        Our Story
+                    </h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        Founded in 2010 by a group of passionate mountain lovers, Astourist - Depot began as a small initiative 
+                        to share the breathtaking beauty of the Himalayas with fellow adventurers. What started as weekend 
+                        trips to Shimla and Manali has evolved into a comprehensive travel service provider.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        Today, we're proud to be one of the most trusted travel partners in Himachal Pradesh, having served 
+                        over 50,000 happy travelers from across the globe. Our deep local knowledge, experienced guides, and 
+                        commitment to sustainable tourism set us apart.
+                    </p>
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        Every journey with us is more than just a trip – it's an immersive experience that connects you with 
+                        the soul of the mountains, the warmth of local communities, and the thrill of adventure.
+                    </p>
+                </div>
+                <div class="reveal">
+                    <img src="resources/trekking.jpg" alt="Himalayan Trekking" class="rounded-2xl shadow-lg w-full h-96 object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Values -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl font-bold text-gray-800 mb-6">
+                    Our Mission & Values
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    We believe in creating meaningful travel experiences that respect the environment and benefit local communities.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center reveal">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-2xl">🌱</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-gray-800 mb-4">Sustainable Tourism</h3>
+                    <p class="text-gray-600">
+                        We promote eco-friendly travel practices and work closely with local communities to preserve 
+                        the natural beauty and cultural heritage of the Himalayas.
+                    </p>
+                </div>
+                
+                <div class="text-center reveal">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-2xl">🤝</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-gray-800 mb-4">Local Partnership</h3>
+                    <p class="text-gray-600">
+                        We collaborate with local guides, homestays, and businesses to ensure that tourism benefits 
+                        the communities that call these mountains home.
+                    </p>
+                </div>
+                
+                <div class="text-center reveal">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-2xl">⭐</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-gray-800 mb-4">Exceptional Service</h3>
+                    <p class="text-gray-600">
+                        From personalized itineraries to 24/7 support, we go the extra mile to ensure every traveler 
+                        has a safe, comfortable, and memorable journey.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="stat-card rounded-2xl p-8 text-center reveal">
+                    <div class="text-4xl font-bold text-green-600 mb-2">50,000+</div>
+                    <p class="text-gray-600 font-semibold">Happy Travelers</p>
+                </div>
+                
+                <div class="stat-card rounded-2xl p-8 text-center reveal">
+                    <div class="text-4xl font-bold text-green-600 mb-2">15+</div>
+                    <p class="text-gray-600 font-semibold">Years of Experience</p>
+                </div>
+                
+                <div class="stat-card rounded-2xl p-8 text-center reveal">
+                    <div class="text-4xl font-bold text-green-600 mb-2">200+</div>
+                    <p class="text-gray-600 font-semibold">Destinations Covered</p>
+                </div>
+                
+                <div class="stat-card rounded-2xl p-8 text-center reveal">
+                    <div class="text-4xl font-bold text-green-600 mb-2">98%</div>
+                    <p class="text-gray-600 font-semibold">Customer Satisfaction</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl font-bold text-gray-800 mb-6">
+                    Meet Our Team
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Our experienced team of mountain enthusiasts, travel experts, and local guides are here to make your journey unforgettable.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="team-card rounded-2xl overflow-hidden shadow-lg reveal">
+                    <div class="h-64 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+                            <span class="text-2xl font-bold text-green-600">RK</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Rajiv Kumar</h3>
+                        <p class="text-green-600 font-semibold mb-3">Founder & CEO</p>
+                        <p class="text-gray-600 text-sm">
+                            A former mountaineer with 20+ years of experience in Himalayan tourism. Rajiv's passion for 
+                            sustainable travel drives our company's vision.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="team-card rounded-2xl overflow-hidden shadow-lg reveal">
+                    <div class="h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+                            <span class="text-2xl font-bold text-blue-600">PS</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Priya Sharma</h3>
+                        <p class="text-blue-600 font-semibold mb-3">Operations Manager</p>
+                        <p class="text-gray-600 text-sm">
+                            Expert in crafting personalized itineraries and managing tour operations. Priya ensures every 
+                            trip runs smoothly from start to finish.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="team-card rounded-2xl overflow-hidden shadow-lg reveal">
+                    <div class="h-64 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+                            <span class="text-2xl font-bold text-purple-600">TS</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Tenzin Sherpa</h3>
+                        <p class="text-purple-600 font-semibold mb-3">Lead Guide</p>
+                        <p class="text-gray-600 text-sm">
+                            Born and raised in the Himalayas, Tenzin brings invaluable local knowledge and 15 years of 
+                            guiding experience to every expedition.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl font-bold text-gray-800 mb-6">
+                    Frequently Asked Questions
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Everything you need to know about booking and traveling with us.
+                </p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="faq-item bg-gray-50 rounded-lg reveal">
+                    <button class="faq-question w-full text-left p-6 font-semibold text-gray-800 hover:text-green-600 transition-colors" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <span>What is included in your tour packages?</span>
+                            <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="faq-answer px-6 pb-6">
+                        <p class="text-gray-600">
+                            Our packages typically include accommodation, meals (breakfast and dinner), transportation, 
+                            sightseeing activities, and professional guide services. Specific inclusions vary by package, 
+                            so please check the detailed itinerary for each tour.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-lg reveal">
+                    <button class="faq-question w-full text-left p-6 font-semibold text-gray-800 hover:text-green-600 transition-colors" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <span>How do I make a booking?</span>
+                            <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="faq-answer px-6 pb-6">
+                        <p class="text-gray-600">
+                            You can book online through our website by selecting your preferred package, filling in traveler 
+                            details, and completing the payment. We accept UPI, credit/debit cards, and net banking. 
+                            You'll receive instant confirmation via email.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-lg reveal">
+                    <button class="faq-question w-full text-left p-6 font-semibold text-gray-800 hover:text-green-600 transition-colors" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <span>What is your cancellation policy?</span>
+                            <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="faq-answer px-6 pb-6">
+                        <p class="text-gray-600">
+                            Cancellations made 30 days before departure receive a full refund minus processing fees. 
+                            15-30 days: 50% refund. Less than 15 days: No refund. However, we understand emergencies 
+                            happen and try to be flexible whenever possible.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-lg reveal">
+                    <button class="faq-question w-full text-left p-6 font-semibold text-gray-800 hover:text-green-600 transition-colors" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <span>Are your tours suitable for families with children?</span>
+                            <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="faq-answer px-6 pb-6">
+                        <p class="text-gray-600">
+                            Absolutely! We offer family-friendly packages with activities suitable for all ages. Our guides 
+                            are experienced in managing groups with children, and we can customize itineraries to match 
+                            your family's interests and energy levels.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-50 rounded-lg reveal">
+                    <button class="faq-question w-full text-left p-6 font-semibold text-gray-800 hover:text-green-600 transition-colors" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <span>What safety measures do you have in place?</span>
+                            <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="faq-answer px-6 pb-6">
+                        <p class="text-gray-600">
+                            Safety is our top priority. All our guides are certified in first aid and mountain rescue. 
+                            We provide quality equipment, maintain emergency contacts, and have partnerships with local 
+                            medical facilities. We also monitor weather conditions and adjust plans as needed.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal" id="getintouch">
+                <h2 class="font-display text-4xl font-bold text-gray-800 mb-6">
+                    Get in Touch
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Ready to start your Himalayan adventure? Contact us today!
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Contact Information -->
+                <div class="space-y-8">
+                    <div class="contact-card rounded-2xl p-6 reveal">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-green-600 text-xl">📍</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Office Address</h3>
+                                <p class="text-gray-600">
+                                    Astourist - Depot<br>
+                                    Mall Road, Shimla<br>
+                                    Himachal Pradesh - 171001<br>
+                                    India
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-card rounded-2xl p-6 reveal">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-blue-600 text-xl">📞</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Phone Numbers</h3>
+                                <p class="text-gray-600">
+                                    <strong>Customer Support:</strong> +91 98765 43210<br>
+                                    <strong>Emergency:</strong> +91 98765 43211<br>
+                                    <strong>Whatsapp:</strong> +91 98765 43212
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-card rounded-2xl p-6 reveal">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-purple-600 text-xl">✉️</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Email Addresses</h3>
+                                <p class="text-gray-600">
+                                    <strong>General:</strong> info@himalayatravels.com<br>
+                                    <strong>Support:</strong> support@himalayatravels.com<br>
+                                    <strong>Business:</strong> business@himalayatravels.com
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-card rounded-2xl p-6 reveal">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-orange-600 text-xl">🕒</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Business Hours</h3>
+                                <p class="text-gray-600">
+                                    <strong>Office:</strong> 9:00 AM - 6:00 PM (Mon-Sat)<br>
+                                    <strong>Support:</strong> 24/7 Emergency Line<br>
+                                    <strong>Booking:</strong> Online 24/7
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map -->
+                <div class="reveal">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <h3 class="font-semibold text-gray-800 mb-4">Find Us</h3>
+                        <div id="map"></div>
+                        <p class="text-sm text-gray-600 mt-4 text-center">
+                            Located in the heart of Shimla, easily accessible from the main bus stand and railway station.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <a href="index.html">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-600 to-green-400 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">AS</span>
+                        </div>
+                        <span class="font-display text-2xl font-bold">Astourist - Depot</span>
+                    </div>
+                    </a>
+                    <p class="text-gray-400 mb-4">
+                        Your trusted partner for unforgettable Himalayan adventures.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="booking.html" class="text-gray-400 hover:text-white transition-colors">Book Now</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms & Conditions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Cancellation Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Contact Info</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <p>📞 +91 98765 43210</p>
+                        <p>📧 info@himalayatravels.com</p>
+                        <p>📍 Shimla, Himachal Pradesh</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Astourist - Depot. All rights reserved. | Made with ❤️ in the Himalayas</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeScrollReveal();
+            initializeMap();
+        });
+
+        // Scroll reveal animation
+        function initializeScrollReveal() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        
+                        // Stagger animation for multiple elements
+                        const siblings = entry.target.parentElement.querySelectorAll('.reveal');
+                        siblings.forEach((sibling, index) => {
+                            setTimeout(() => {
+                                sibling.classList.add('active');
+                            }, index * 100);
+                        });
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all reveal elements
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Initialize map
+        function initializeMap() {
+            // Shimla coordinates
+            const shimlaCoords = [31.1048, 77.1734];
+            
+            const map = L.map('map').setView(shimlaCoords, 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Add marker
+            L.marker(shimlaCoords)
+                .addTo(map)
+                .bindPopup('<b>Astourist - Depot</b><br>Mall Road, Shimla')
+                .openPopup();
+        }
+
+        // FAQ toggle functionality
+        function toggleFAQ(button) {
+            const faqItem = button.closest('.faq-item');
+            const answer = faqItem.querySelector('.faq-answer');
+            const icon = button.querySelector('svg');
+            
+            // Close all other FAQs
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (item !== faqItem) {
+                    item.classList.remove('active');
+                    item.querySelector('.faq-answer').classList.remove('active');
+                    item.querySelector('svg').style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // Toggle current FAQ
+            faqItem.classList.toggle('active');
+            answer.classList.toggle('active');
+            
+            if (answer.classList.contains('active')) {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+    <script src="main.js"></script>
+</body>
+</html>
