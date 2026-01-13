@@ -859,39 +859,11 @@
             const total = bookingData.package ? bookingData.package.price * 1.18 : 0;
             
             container.innerHTML = `
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Booking ID:</span>
-                        <span class="font-semibold">${bookingData.payment.transactionId}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Package:</span>
-                        <span class="font-semibold">${bookingData.package ? bookingData.package.package : 'N/A'}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Traveler:</span>
-                        <span class="font-semibold">${bookingData.traveler ? bookingData.traveler.fullName : 'N/A'}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Total Paid:</span>
-                        <span class="font-semibold text-green-600">₹2,000</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Payment Method:</span>
-                        <span class="font-semibold">${bookingData.payment.method}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Booking Date:</span>
-                        <span class="font-semibold">${new Date().toLocaleDateString('en-IN')}</span>
-                    </div>
-                     <div class="flex justify-between">
-                        <span class="text-gray-600">Departure Date:</span>
-                        <span class="font-semibold">21/01/2026</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Return Date:</span>
-                        <span class="font-semibold">24/01/2026 (3 days)</span>
-                    </div>
+                <div class="space-y-3 text-sm" style="text-align : center">
+                   <p>Thank you for your booking! Your booking has been confirmed.<br>You will get your ticket via email shortly. So Please consider checking your email for the Details/Ticket in 24 hours.</p>
+                </div>
+                <div class="space-y-3 text-sm" style="text-align : center">
+                   <p>For more confirmation, we will contact you via email or phone.</p>
                 </div>
             `;
             
